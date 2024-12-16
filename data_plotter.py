@@ -3,7 +3,7 @@ import matplotlib.dates as mdates
 import numpy as np
 import data_handler
 import gpr_wrapper
-
+import GPR
 
 class plotter:
     __company_name = None
@@ -16,6 +16,7 @@ class plotter:
     __gpr = None
 
     def __init__(self, company_name: str):
+        self.isGpytorch = True
         self.__company_name = company_name
         self.__company_handler = data_handler.csv_handler(company_name)
         self.__prices_data = self.__company_handler.get_equal_length_prices()
@@ -23,7 +24,10 @@ class plotter:
         self.__years = self.__company_handler.years
         self.__max_days = self.__company_handler.max_days
         self.__quarter_length = int(self.__max_days / 4)
-        self.__gpr = gpr_wrapper.wrapper(company_name)
+        if self.isGpytorch:
+            self.__gpr = GPR.WrapperGPyTorch(company_name)
+        else:
+            self.__gpr = gpr_wrapper.wrapper(company_name)
 
     def show_preprocessed_price(self, year: int):
         self.show_preprocessed_prices(start_year=year, end_year=year)
@@ -82,8 +86,13 @@ class plotter:
         x_mesh, y_mean, y_cov = self.__gpr.get_eval_model(start_year=train_start, end_year=train_end,
                                                           pred_year=pred_year,
                                                           pred_quarters=pred_quarters)
-        y_lower = y_mean - np.sqrt(np.diag(y_cov))
-        y_upper = y_mean + np.sqrt(np.diag(y_cov))
+        if self.isGpytorch:
+            y_lower = y_mean - np.sqrt(y_cov)
+            y_upper = y_mean + np.sqrt(y_cov)
+        else:    
+            y_lower = y_mean - np.sqrt(np.diag(y_cov))
+            y_upper = y_mean + np.sqrt(np.diag(y_cov))
+        #__import__('ipdb').set_trace()  
         y_max = max(abs(min(y_lower) - 1), abs(max(y_upper) + 1))
         ax.set_ylim(bottom=-y_max, top=y_max)
 

@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF
-
+from tqdm import tqdm
 import data_handler
 
 
@@ -50,11 +50,17 @@ class wrapper:
 
         X = first_year_X
         Y = np.array(first_year_prices)
+        data_X = []
+        data_Y = []
+
         for current_year in training_years[1:]:
-            current_year_prices = list(df_prices.loc[:, current_year])
-            current_year_X = np.array([[current_year, day] for day in possible_days])
-            X = np.append(X, current_year_X, axis=0)
-            Y = np.append(Y, current_year_prices)
+            current_year_prices = df_prices[current_year].dropna().values
+            current_year_X = [[current_year, day] for day in possible_days[:len(current_year_prices)]]
+            data_X.extend(current_year_X)
+            data_Y.extend(current_year_prices)
+
+        X = np.array(data_X)
+        Y = np.array(data_Y)
 
         last_year_prices = df_prices[end_year]
         last_year_prices = last_year_prices[last_year_prices.iloc[:].notnull()]
@@ -77,7 +83,7 @@ class wrapper:
         x_mesh = np.linspace(pred_days[0], pred_days[-1]
                              , 2000)
         x_pred = ([[pred_year, x_mesh[i]] for i in range(len(x_mesh))])
-
+        __import__('ipdb').set_trace()
         self.__gp = self.__gp.fit(X, Y)
         self.__kernels.append(self.__gp.kernel_)
 

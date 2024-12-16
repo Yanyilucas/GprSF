@@ -25,11 +25,14 @@ def make_summary(company_name):
 
 
 def __init_data():
-    for company in os.listdir('data'):
-        current_company = company.split('.')[0]
-        #companies.append(current_company)
-        plotters[current_company] = (data_plotter.plotter(company_name=current_company))
-
+    if companies == []:
+        for company in os.listdir('data'):
+            current_company = company.split('.')[0]
+            companies.append(current_company)
+            plotters[current_company] = (data_plotter.plotter(company_name=current_company))
+    else:
+        for company in companies:
+            plotters[company] = (data_plotter.plotter(company_name=company))
 
 if __name__ == "__main__":
     main()
