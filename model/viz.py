@@ -7,7 +7,6 @@ import os
 from . import dataset 
 from . import GPR as GPR
 
-
 class plotter:
     __company_name = None
     __company_handler = None
@@ -17,7 +16,7 @@ class plotter:
     __max_days = None
     __quarter_length = None
     __gpr = None
-    __picdir="../pic"
+    __picdir="./pic"
     def __init__(self, company_name: str):
         self.isGpytorch = True
         self.__company_name = company_name
@@ -79,6 +78,7 @@ class plotter:
         fname = '{}-{}-normalized_prices.png'.format(start_year, end_year)
         fname = os.path.join(self.company_dir, fname)
         fig.savefig(fname, dpi=fig.dpi)
+        plt.close(fig)  # 确保释放图像对象，避免复用
 
     def show_gp_prediction(self, train_start: int, train_end: int, pred_year: int, pred_quarters: list = None):
         """
@@ -99,6 +99,7 @@ class plotter:
                                                           pred_year=pred_year,
                                                           pred_quarters=pred_quarters)
         if self.isGpytorch:
+            #* 经验公式 [μ-σ, μ+σ] 为 95% 置信区间
             y_lower = y_mean - np.sqrt(y_cov)
             y_upper = y_mean + np.sqrt(y_cov)
         else:    
@@ -142,6 +143,7 @@ class plotter:
         fname = '{}-prediction.png'.format(pred_year)
         fname = os.path.join(self.company_dir, fname)
         fig.savefig(fname, dpi=fig.dpi)
+        plt.close(fig)  # 确保释放图像对象，避免复用
 
     def show_whole_time_series(self, intermediate: bool = False):
         self.show_time_series(start_year=self.__years[0], end_year=self.__years[-1], intermediate=intermediate)
@@ -192,6 +194,7 @@ class plotter:
         fname = '{}-{}-prices.png'.format(start_year, end_year)
         fname = os.path.join(self.company_dir, fname)
         fig.savefig(fname, dpi=fig.dpi)
+        plt.close(fig)  # 确保释放图像对象，避免复用
 
     def __validate_dates(self, start_year: int, end_year: int):
         if start_year < self.__years[0] or end_year > self.__years[-1]:

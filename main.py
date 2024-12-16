@@ -18,11 +18,11 @@ def main():
 def make_summary(company_name):
     plotter = plotters[company_name]
 
-    plotter.show_whole_time_series()
-    plotter.show_time_series(start_year=start_year, end_year=2016)
-    plotter.show_preprocessed_prices(start_year=start_year, end_year=2016)
+    #plotter.show_whole_time_series()
+    #plotter.show_time_series(start_year=start_year, end_year=2016)
+    #plotter.show_preprocessed_prices(start_year=start_year, end_year=2016)
     plotter.show_gp_prediction(train_start=start_year, train_end=2016, pred_year=2017)
-    plotter.show_time_series(start_year=start_year, end_year=2018)
+    #plotter.show_time_series(start_year=start_year, end_year=2018)
     plotter.show_gp_prediction(train_start=start_year, train_end=2018, pred_year=2018, pred_quarters= [3, 4])
 
 
