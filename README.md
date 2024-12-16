@@ -1,2 +1,3 @@
-# GPR-Stock-Forecast
+# GPR-Stock-Forecast 📈 🔍
+
 A Gaussian Process Regression Model for Predicting Stock Trends

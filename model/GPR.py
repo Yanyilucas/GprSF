@@ -26,7 +26,6 @@ class ExactGPModel(gpytorch.models.ExactGP):
 class WrapperGPyTorch:
     """
     使用 GPyTorch 实现的高斯过程回归模型封装类。
-    适用于 Mac M1（不需要 CUDA）。
     """
     def __init__(self, company_name: str):
         self.__company_data = data_handler.csv_handler(company_name)
@@ -119,10 +118,11 @@ class WrapperGPyTorch:
         self.__model.train()
         self.__likelihood.train()
 
-        optimizer = torch.optim.Adam(
-    list(self.__model.parameters()) + list(self.__likelihood.parameters()),
-    lr=0.1
-)
+        optimizer = torch.optim.Adam([
+        {'params': self.__model.mean_module.parameters(), 'lr': 0.1},  # 仅包含模型均值部分参数
+        {'params': self.__model.covar_module.parameters(), 'lr': 0.1}, # 仅包含模型协方差部分参数
+        {'params': self.__likelihood.parameters(), 'lr': 0.1},         # 仅包含似然部分参数
+        ])
 
         mll = gpytorch.mlls.ExactMarginalLogLikelihood(self.__likelihood, self.__model)
 
