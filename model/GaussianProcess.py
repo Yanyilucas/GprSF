@@ -23,7 +23,7 @@ class ExactGPModel(gpytorch.models.ExactGP):
         return gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
 
 
-class WrapperGPyTorch:
+class GPR:
     """
     使用 GPyTorch 实现的高斯过程回归模型封装类。
     """

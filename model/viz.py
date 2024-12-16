@@ -5,7 +5,7 @@ import os
 
 
 from . import dataset 
-from . import GPR as GPR
+from . import GaussianProcess as GaussianProcess
 
 class plotter:
     __company_name = None
@@ -27,7 +27,7 @@ class plotter:
         self.__max_days = self.__company_handler.max_days
         self.__quarter_length = int(self.__max_days / 4)
         if self.isGpytorch:
-            self.__gpr = GPR.WrapperGPyTorch(company_name)
+            self.__gpr = GaussianProcess.GPR(company_name)
         else:
             raise NotImplementedError("Not implemented for GPy")
         self.company_dir=os.path.join(self.__picdir,self.__company_name)
@@ -150,7 +150,8 @@ class plotter:
 
     def show_time_series(self, start_year: int, end_year: int, intermediate: bool = True):
         self.__validate_dates(start_year=start_year, end_year=end_year)
-
+        if self.__company_name == 'COMP':
+                    __import__('ipdb').set_trace()
         prices_data = self.__company_handler.get_whole_prices(start_year=start_year, end_year=end_year)
 
         fig = plt.figure(num=self.__company_name + ' prices')

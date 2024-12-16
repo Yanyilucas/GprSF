@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 
-
 class csv_handler:
     df = None
     quarters = None
@@ -9,6 +8,8 @@ class csv_handler:
     max_days = None
 
     def __init__(self, csv_name: str):
+        if csv_name == 'COMP':
+            __import__('ipdb').set_trace()
         self.__load_data(csv_name)
         self.df['Norm Adj Close'] = self.__add_normalized_data(self.df)
         self.df['Quarter'] = self.__add_quarters(self.df)
@@ -62,13 +63,45 @@ class csv_handler:
         with pd.option_context('display.max_rows', max_rows, 'display.max_columns', max_columns):
             print(self.df)
 
+    # def __load_data(self, csv_name: str):
+    #     self.df = pd.read_csv('Data/' + csv_name + '.csv')
+    #     self.df = self.df.iloc[:, [0, 5]]
+    #     self.df = self.df.dropna()
+    #     self.df.Date = pd.to_datetime(self.df.Date)
+    #     self.quarters = ['Q' + str(i) for i in range(1, 5)]
     def __load_data(self, csv_name: str):
+        """
+        自动兼容两种 CSV 格式：
+        - 旧格式：含有 'Adj Close' 列
+        - 新格式：没有 'Adj Close' 列，但含有 'Close/Last' 列
+        
+        最终将收盘价统一命名为 'Adj Close'，并只保留 'Date' 与 'Adj Close' 两列。
+        """
+        
+        # 1. 读取 CSV
         self.df = pd.read_csv('Data/' + csv_name + '.csv')
-        self.df = self.df.iloc[:, [0, 5]]
-        self.df = self.df.dropna()
-        self.df.Date = pd.to_datetime(self.df.Date)
-        self.quarters = ['Q' + str(i) for i in range(1, 5)]
+        
+        # 2. 如果原 CSV 中不存在 'Adj Close' 列，但存在 'Close/Last' 列，则重命名
+        if 'Adj Close' not in self.df.columns:
+            if 'Close/Last' in self.df.columns:
+                self.df.rename(columns={'Close/Last': 'Adj Close'}, inplace=True)
+            else:
+                raise ValueError(
+                    f'CSV 文件没有 "Adj Close" 或 "Close/Last" 列，无法解析: {csv_name}'
+                )
+        
+        # 3. 保留需要用的列：只留 'Date' 和 'Adj Close'
+        #   如果后续需要 'Open' / 'High' / 'Low' 等列，可根据需求保留
+        self.df = self.df[['Date', 'Adj Close']]
 
+        # 4. 清理缺失值
+        self.df.dropna(inplace=True)
+
+        # 5. 转换日期类型（自动解析；若有格式异常可指定 format='%m/%d/%Y' ）
+        self.df['Date'] = pd.to_datetime(self.df['Date'])
+
+        # 6. 生成四个季度标签（Q1 ~ Q4），供后续逻辑使用
+        self.quarters = ['Q' + str(i) for i in range(1, 5)]
 
     def __add_normalized_data(self, df):
         normalized_list = []
