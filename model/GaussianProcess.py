@@ -28,19 +28,19 @@ class GPR:
     使用 GPyTorch 实现的高斯过程回归模型封装类。
     """
     def __init__(self, company_name: str):
-        self.__company_data = dataset.csv_handler(company_name)
-        self.__prices_data = self.__company_data.get_equal_length_prices()
-        self.__quarters = self.__company_data.quarters
-        self.__years = self.__company_data.years
-        self.__max_days = self.__company_data.max_days
+        self.company_data = dataset.csv_handler(company_name)
+        self.prices_data = self.company_data.get_equal_length_prices()
+        self.quarters = self.company_data.quarters
+        self.years = self.company_data.years
+        self.max_days = self.company_data.max_days
 
         # GPyTorch 相关属性
-        self.__model = None
-        self.__likelihood = None
-        self.__kernels = []
+        self.model = None
+        self.likelihood = None
+        self.kernels = []
 
         # 训练迭代次数，可以根据需求调整
-        self.__iterations = 50
+        self.iterations = 50
 
     def get_eval_model(self, start_year: int, end_year: int, pred_year: int, pred_quarters: list = None):
         """
@@ -54,13 +54,13 @@ class GPR:
         # 1. 准备训练数据 X, Y
         years_quarters = list(range(start_year, end_year + 1)) + ['Quarter']
         training_years = years_quarters[:-2]
-        df_prices = self.__prices_data[self.__prices_data.columns.intersection(years_quarters)]
+        df_prices = self.prices_data[self.prices_data.columns.intersection(years_quarters)]
 
         possible_days = list(df_prices.index.values)
         
         # 处理第一个年份数据
         first_year_prices = df_prices[start_year]
-        if start_year == self.__company_data.years[0]:
+        if start_year == self.company_data.years[0]:
             first_year_prices = first_year_prices[first_year_prices != 0]
             first_year_prices = pd.concat([
                 pd.Series([0.0], index=[first_year_prices.index[0] - 1]),
@@ -102,50 +102,50 @@ class GPR:
         if pred_quarters is not None:
             pred_days = list(range(63 * (pred_quarters[0] - 1), 63 * pred_quarters[-1]))
         else:
-            pred_days = list(range(0, self.__max_days))
+            pred_days = list(range(0, self.max_days))
 
         x_mesh = np.linspace(pred_days[0], pred_days[-1], 2000)
         x_pred = np.column_stack((np.full_like(x_mesh, pred_year), x_mesh))
 
         # 3. 构建 GPyTorch 模型和似然函数
-        self.__likelihood = gpytorch.likelihoods.GaussianLikelihood()
+        self.likelihood = gpytorch.likelihoods.GaussianLikelihood()
         train_x = torch.from_numpy(X).float()
         train_y = torch.from_numpy(Y).float()
 
-        self.__model = ExactGPModel(train_x, train_y, self.__likelihood)
+        self.model = ExactGPModel(train_x, train_y, self.likelihood)
 
         # 4. 训练模型，使用 tqdm 显示进度
-        self.__model.train()
-        self.__likelihood.train()
+        self.model.train()
+        self.likelihood.train()
 
         optimizer = torch.optim.Adam([
-        {'params': self.__model.mean_module.parameters(), 'lr': 0.1},  # 仅包含模型均值部分参数
-        {'params': self.__model.covar_module.parameters(), 'lr': 0.1}, # 仅包含模型协方差部分参数
-        {'params': self.__likelihood.parameters(), 'lr': 0.1},         # 仅包含似然部分参数
+        {'params': self.model.mean_module.parameters(), 'lr': 0.1},  # 仅包含模型均值部分参数
+        {'params': self.model.covar_module.parameters(), 'lr': 0.1}, # 仅包含模型协方差部分参数
+        {'params': self.likelihood.parameters(), 'lr': 0.1},         # 仅包含似然部分参数
         ])
 
-        mll = gpytorch.mlls.ExactMarginalLogLikelihood(self.__likelihood, self.__model)
+        mll = gpytorch.mlls.ExactMarginalLogLikelihood(self.likelihood, self.model)
 
         # 训练循环
-        for i in tqdm(range(self.__iterations), desc="Training GPyTorch GP", unit="iter"):
+        for i in tqdm(range(self.iterations), desc="Training GPyTorch GP", unit="iter"):
             optimizer.zero_grad()
-            output = self.__model(train_x)
+            output = self.model(train_x)
             loss = -mll(output, train_y)
             loss.backward()
             optimizer.step()
 
         # 5. 预测
-        self.__model.eval()
-        self.__likelihood.eval()
+        self.model.eval()
+        self.likelihood.eval()
 
         test_x = torch.from_numpy(x_pred).float()
         with torch.no_grad(), gpytorch.settings.fast_pred_var():
-            observed_pred = self.__likelihood(self.__model(test_x))
+            observed_pred = self.likelihood(self.model(test_x))
             y_mean = observed_pred.mean.numpy()
             y_cov = observed_pred.variance.numpy()
 
         # 存储核函数以便查看
-        self.__kernels.append(self.__model.covar_module)
+        self.kernels.append(self.model.covar_module)
 
         return x_mesh, y_mean, y_cov
 
@@ -153,4 +153,4 @@ class GPR:
         """
         返回所使用的核函数列表。
         """
-        return self.__kernels
+        return self.kernels

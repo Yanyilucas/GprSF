@@ -8,15 +8,14 @@ class csv_handler:
     max_days = None
 
     def __init__(self, csv_name: str):
-        if csv_name == 'COMP':
-            __import__('ipdb').set_trace()
-        self.__load_data(csv_name)
-        self.df['Norm Adj Close'] = self.__add_normalized_data(self.df)
-        self.df['Quarter'] = self.__add_quarters(self.df)
+        self.csv_name = csv_name
+        self.load_data(csv_name)
+        self.df['Norm Adj Close'] = self.add_normalized_data(self.df)
+        self.df['Quarter'] = self.add_quarters(self.df)
         self.max_days = 256
 
     def get_equal_length_prices(self, normalized=True):
-        df = self.__shift_first_year_prices()
+        df = self.shift_first_year_prices()
         for i in range(1, len(self.years)):
             df = pd.concat([df, pd.DataFrame(self.get_year_data(year=self.years[i], normalized=normalized))], axis=1)
 
@@ -32,7 +31,7 @@ class csv_handler:
         df.columns = self.years + ['Quarter']
         df.index.name = 'Day'
 
-        self.__fill_last_rows(df)
+        self.fill_last_rows(df)
 
         return df
 
@@ -63,13 +62,8 @@ class csv_handler:
         with pd.option_context('display.max_rows', max_rows, 'display.max_columns', max_columns):
             print(self.df)
 
-    # def __load_data(self, csv_name: str):
-    #     self.df = pd.read_csv('Data/' + csv_name + '.csv')
-    #     self.df = self.df.iloc[:, [0, 5]]
-    #     self.df = self.df.dropna()
-    #     self.df.Date = pd.to_datetime(self.df.Date)
-    #     self.quarters = ['Q' + str(i) for i in range(1, 5)]
-    def __load_data(self, csv_name: str):
+   
+    def load_data(self, csv_name: str):
         """
         自动兼容两种 CSV 格式：
         - 旧格式：含有 'Adj Close' 列
@@ -103,12 +97,14 @@ class csv_handler:
         # 6. 生成四个季度标签（Q1 ~ Q4），供后续逻辑使用
         self.quarters = ['Q' + str(i) for i in range(1, 5)]
 
-    def __add_normalized_data(self, df):
+    def add_normalized_data(self, df):
+        # if self.csv_name == 'COMP':
+        #     __import__('ipdb').set_trace()
         normalized_list = []
 
         self.years = list(df.Date)
         self.years = list({year.year for year in self.years})
-
+        self.years.sort()
         for year in self.years:
             prices = self.get_year_data(year=year, normalized=False)
             mean = np.mean(prices)
@@ -121,14 +117,14 @@ class csv_handler:
         normalized = pd.concat([pd.DataFrame(lst) for lst in normalized_list], ignore_index=True)
 
         return normalized
-    def __add_quarters(self, df):
+    def add_quarters(self, df):
         quarters_list = []
 
         for year in self.years:
             # 筛选特定年份的数据
             dates = df.loc[df['Date'].dt.year == year, 'Date']
             # 获取每个日期对应的季度
-            quarters = [self.__get_quarter(date.month) for date in dates]
+            quarters = [self.get_quarter(date.month) for date in dates]
             # 将季度数据转换为 DataFrame 并添加到列表中
             quarters_df = pd.DataFrame(quarters)
             quarters_list.append(quarters_df)
@@ -138,17 +134,17 @@ class csv_handler:
 
         return quarters
 
-    def __get_quarter(self, month: int):
+    def get_quarter(self, month: int):
         return self.quarters[(month - 1) // 3]
 
-    def __shift_first_year_prices(self):
+    def shift_first_year_prices(self):
         prices = pd.DataFrame(self.get_year_data(self.years[0]))
         df = pd.DataFrame([0 for _ in range(self.max_days - len(prices.index))])
         df = pd.concat([df, prices], ignore_index=True)
 
         return df
 
-    def __fill_last_rows(self, df):
+    def fill_last_rows(self, df):
         years = self.years[:-1]
 
         for year in years:

@@ -10,7 +10,7 @@ start_year = 2015
 
 
 def main():
-    __init_data()
+    init_data()
     for company in companies:
         make_summary(company)
 
@@ -26,7 +26,7 @@ def make_summary(company_name):
     plotter.show_gp_prediction(train_start=start_year, train_end=2018, pred_year=2018, pred_quarters= [3, 4])
 
 
-def __init_data():
+def init_data():
     if companies == []:
         for company in os.listdir('data'):
             current_company = company.split('.')[0]
