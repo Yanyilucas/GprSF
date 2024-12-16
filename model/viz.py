@@ -4,11 +4,8 @@ import numpy as np
 import os
 
 
-from . import data_handler 
-from . import gpr_wrapper 
+from . import dataset 
 from . import GPR as GPR
-
-
 
 
 class plotter:
@@ -24,7 +21,7 @@ class plotter:
     def __init__(self, company_name: str):
         self.isGpytorch = True
         self.__company_name = company_name
-        self.__company_handler = data_handler.csv_handler(company_name)
+        self.__company_handler = dataset.csv_handler(company_name)
         self.__prices_data = self.__company_handler.get_equal_length_prices()
         self.__quarters = self.__company_handler.quarters
         self.__years = self.__company_handler.years
@@ -33,8 +30,7 @@ class plotter:
         if self.isGpytorch:
             self.__gpr = GPR.WrapperGPyTorch(company_name)
         else:
-            self.__gpr = gpr_wrapper.wrapper(company_name)
-
+            raise NotImplementedError("Not implemented for GPy")
         self.company_dir=os.path.join(self.__picdir,self.__company_name)
 
         os.makedirs(self.company_dir, exist_ok=True)
@@ -70,6 +66,7 @@ class plotter:
             if i < 4:
                 ax.text((self.__max_days / 4) * i + self.__max_days / 8 - 5, y_max - 0.5, self.__quarters[i],
                         fontsize=12)
+                
         plt.hlines(y=0, xmin=x_min, xmax=x_max, color='black', linestyles='--', alpha=.6, zorder=-1)
 
         plt.grid(True, alpha=.25)
@@ -84,6 +81,10 @@ class plotter:
         fig.savefig(fname, dpi=fig.dpi)
 
     def show_gp_prediction(self, train_start: int, train_end: int, pred_year: int, pred_quarters: list = None):
+        """
+        show prediction diagram
+        """
+        #__import__('ipdb').set_trace()
         self.__validate_dates(start_year=train_start, end_year=pred_year)
 
         prices = self.__prices_data[pred_year]
@@ -101,9 +102,8 @@ class plotter:
             y_lower = y_mean - np.sqrt(y_cov)
             y_upper = y_mean + np.sqrt(y_cov)
         else:    
-            y_lower = y_mean - np.sqrt(np.diag(y_cov))
-            y_upper = y_mean + np.sqrt(np.diag(y_cov))
-        #__import__('ipdb').set_trace()  
+            raise NotImplementedError("Not implemented for GPy")
+
         y_max = max(abs(min(y_lower) - 1), abs(max(y_upper) + 1))
         ax.set_ylim(bottom=-y_max, top=y_max)
 

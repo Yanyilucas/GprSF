@@ -2,10 +2,10 @@
 from typing import Dict
 import os
 import sys
-from model import data_plotter
+from model import viz
 
 companies = []
-plotters:  Dict[str, data_plotter.plotter] = {}
+plotters:  Dict[str, viz.plotter] = {}
 start_year = 2008
 
 
@@ -31,10 +31,10 @@ def __init_data():
         for company in os.listdir('data'):
             current_company = company.split('.')[0]
             companies.append(current_company)
-            plotters[current_company] = (data_plotter.plotter(company_name=current_company))
+            plotters[current_company] = (viz.plotter(company_name=current_company))
     else:
         for company in companies:
-            plotters[company] = (data_plotter.plotter(company_name=company))
+            plotters[company] = (viz.plotter(company_name=company))
 
 if __name__ == "__main__":
     main()

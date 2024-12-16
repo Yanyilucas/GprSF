@@ -12,7 +12,7 @@ class csv_handler:
         self.__load_data(csv_name)
         self.df['Norm Adj Close'] = self.__add_normalized_data(self.df)
         self.df['Quarter'] = self.__add_quarters(self.df)
-        self.max_days = 252
+        self.max_days = 256
 
     def get_equal_length_prices(self, normalized=True):
         df = self.__shift_first_year_prices()

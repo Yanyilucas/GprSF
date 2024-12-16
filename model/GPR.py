@@ -3,7 +3,7 @@ import pandas as pd
 import torch
 import gpytorch
 from tqdm import tqdm
-from . import data_handler 
+from . import dataset 
 
 
 class ExactGPModel(gpytorch.models.ExactGP):
@@ -28,7 +28,7 @@ class WrapperGPyTorch:
     使用 GPyTorch 实现的高斯过程回归模型封装类。
     """
     def __init__(self, company_name: str):
-        self.__company_data = data_handler.csv_handler(company_name)
+        self.__company_data = dataset.csv_handler(company_name)
         self.__prices_data = self.__company_data.get_equal_length_prices()
         self.__quarters = self.__company_data.quarters
         self.__years = self.__company_data.years

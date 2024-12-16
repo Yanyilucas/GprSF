@@ -1,1 +1,1 @@
-from . import data_plotter 
+from . import viz 
