@@ -3,7 +3,7 @@ import pandas as pd
 import torch
 import gpytorch
 from tqdm import tqdm
-import data_handler
+from . import data_handler 
 
 
 class ExactGPModel(gpytorch.models.ExactGP):

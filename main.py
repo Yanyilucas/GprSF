@@ -1,8 +1,10 @@
+
 from typing import Dict
 import os
-import data_plotter
+import sys
+from model import data_plotter
 
-companies = ['BA']
+companies = []
 plotters:  Dict[str, data_plotter.plotter] = {}
 start_year = 2008
 

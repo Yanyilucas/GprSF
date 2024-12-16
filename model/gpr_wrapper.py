@@ -2,8 +2,7 @@ import numpy as np
 import pandas as pd
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF
-from tqdm import tqdm
-import data_handler
+from . import data_handler as data_handler
 
 
 class wrapper:

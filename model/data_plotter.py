@@ -1,9 +1,15 @@
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import numpy as np
-import data_handler
-import gpr_wrapper
-import GPR
+import os
+
+
+from . import data_handler 
+from . import gpr_wrapper 
+from . import GPR as GPR
+
+
+
 
 class plotter:
     __company_name = None
@@ -14,7 +20,7 @@ class plotter:
     __max_days = None
     __quarter_length = None
     __gpr = None
-
+    __picdir="../pic"
     def __init__(self, company_name: str):
         self.isGpytorch = True
         self.__company_name = company_name
@@ -29,6 +35,10 @@ class plotter:
         else:
             self.__gpr = gpr_wrapper.wrapper(company_name)
 
+        self.company_dir=os.path.join(self.__picdir,self.__company_name)
+
+        os.makedirs(self.company_dir, exist_ok=True)
+        
     def show_preprocessed_price(self, year: int):
         self.show_preprocessed_prices(start_year=year, end_year=year)
 
@@ -68,8 +78,9 @@ class plotter:
         plt.ylabel('Normalized price')
 
         plt.tight_layout()
-
-        fname = '{}_{}_{}_normalized_prices.png'.format(self.__company_name, start_year, end_year)
+        
+        fname = '{}-{}-normalized_prices.png'.format(start_year, end_year)
+        fname = os.path.join(self.company_dir, fname)
         fig.savefig(fname, dpi=fig.dpi)
 
     def show_gp_prediction(self, train_start: int, train_end: int, pred_year: int, pred_quarters: list = None):
@@ -127,7 +138,9 @@ class plotter:
 
         plt.tight_layout()
 
-        fname = '{}_{}_prediction.png'.format(self.__company_name, pred_year)
+        
+        fname = '{}-prediction.png'.format(pred_year)
+        fname = os.path.join(self.company_dir, fname)
         fig.savefig(fname, dpi=fig.dpi)
 
     def show_whole_time_series(self, intermediate: bool = False):
@@ -176,7 +189,8 @@ class plotter:
 
         plt.tight_layout()
 
-        fname = '{}_{}_{}_prices.png'.format(self.__company_name, start_year, end_year)
+        fname = '{}-{}-prices.png'.format(start_year, end_year)
+        fname = os.path.join(self.company_dir, fname)
         fig.savefig(fname, dpi=fig.dpi)
 
     def __validate_dates(self, start_year: int, end_year: int):
