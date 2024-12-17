@@ -6,7 +6,7 @@ from model import viz
 
 companies = ['COMP','OMHX25','NDX']
 plotters:  Dict[str, viz.plotter] = {}
-start_year = 2020
+start_year = 2014
 
 
 def main():

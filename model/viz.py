@@ -21,7 +21,7 @@ class plotter:
         self.isGpytorch = True
         self.company_name = company_name
         self.company_handler = dataset.csv_handler(company_name)
-        self.prices_data = self.company_handler.get_equal_length_prices()
+        self.prices_data = self.company_handler.get_equal_length_prices()#! 升序
         self.quarters = self.company_handler.quarters
         self.years = self.company_handler.years
         # print(self.years)

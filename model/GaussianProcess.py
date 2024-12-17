@@ -29,7 +29,7 @@ class GPR:
     """
     def __init__(self, company_name: str):
         self.company_data = dataset.csv_handler(company_name)
-        self.prices_data = self.company_data.get_equal_length_prices()
+        self.prices_data = self.company_data.get_equal_length_prices()#升序时间顺序
         self.quarters = self.company_data.quarters
         self.years = self.company_data.years
         self.max_days = self.company_data.max_days
@@ -40,7 +40,7 @@ class GPR:
         self.kernels = []
 
         # 训练迭代次数，可以根据需求调整
-        self.iterations = 80
+        self.iterations = 20
 
     def get_eval_model(self, start_year: int, end_year: int, pred_year: int, pred_quarters: list = None):
         """
@@ -54,7 +54,9 @@ class GPR:
         # 1. 准备训练数据 X, Y
         years_quarters = list(range(start_year, end_year + 1)) + ['Quarter']
         training_years = years_quarters[:-2]
-        df_prices = self.prices_data[self.prices_data.columns.intersection(years_quarters)]
+        #__import__('ipdb').set_trace()
+        df_prices = self.prices_data[self.prices_data.columns.intersection(years_quarters)]#!升序的
+        #__import__('ipdb').set_trace()
 
         possible_days = list(df_prices.index.values)
         

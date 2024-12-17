@@ -13,12 +13,14 @@ class csv_handler:
         self.df['Norm Adj Close'] = self.add_normalized_data(self.df)
         #__import__('ipdb').set_trace()
         self.df['Quarter'] = self.add_quarters(self.df)
-        self.max_days = 256
+        self.max_days = 240
 
     def get_equal_length_prices(self, normalized=True):
-        df = self.shift_first_year_prices()
+        #__import__('ipdb').set_trace()
+        df = self.shift_first_year_prices()#! 按Day排列应该为升序,这个是升序(第一年的数据)
         for i in range(1, len(self.years)):
-            df = pd.concat([df, pd.DataFrame(self.get_year_data(year=self.years[i], normalized=normalized))], axis=1)
+            #! 注意 self.get_year_data要反转!!
+            df = pd.concat([df, pd.DataFrame(self.get_year_data(year=self.years[i], normalized=normalized)[::-1])], axis=1)
 
         df = df[:self.max_days]
 
@@ -104,14 +106,15 @@ class csv_handler:
         """
         为每一年的'Adj Close'添加归一化后的数据，并将每年的第一个数据点平移到0。
         """
+        
         # 按年份分组
         grouped = df.groupby(df['Date'].dt.year)
         # 归一化每组数据
         df['Norm Adj Close'] = grouped['Adj Close'].transform(lambda x: (x - x.mean()) / x.std())
 
-        # 将每年的第一个数据点平移到0
-        df['Norm Adj Close'] = grouped['Norm Adj Close'].transform(lambda x: x - x.iloc[0])
-
+        # 将每年的第一天数据点平移到0,由于日期降序排列，所以iloc[-1]是每年的第一天
+        df['Norm Adj Close'] = grouped['Norm Adj Close'].transform(lambda x: x - x.iloc[-1])
+        #__import__('ipdb').set_trace()
         return df['Norm Adj Close']
 
     def add_quarters(self, df):
@@ -135,13 +138,15 @@ class csv_handler:
         return self.quarters[(month - 1) // 3]
 
     def shift_first_year_prices(self):
-        prices = pd.DataFrame(self.get_year_data(self.years[0]))
+        #__import__('ipdb').set_trace()
+        prices = pd.DataFrame(self.get_year_data(self.years[0])[::-1])
         df = pd.DataFrame([0 for _ in range(self.max_days - len(prices.index))])
         df = pd.concat([df, prices], ignore_index=True)
 
         return df
 
     def fill_last_rows(self, df):
+        #均值填充NAN数据
         years = self.years[:-1]
 
         for year in years:
