@@ -127,12 +127,14 @@ class GPR:
         mll = gpytorch.mlls.ExactMarginalLogLikelihood(self.likelihood, self.model)
 
         # 训练循环
-        for i in tqdm(range(self.iterations), desc="Training GPyTorch GP", unit="iter"):
+        for _ in tqdm(range(self.iterations), desc="Training GPyTorch GP", unit="iter"):
             optimizer.zero_grad()
             output = self.model(train_x)
-            loss = -mll(output, train_y)
+            loss = -mll(output, train_y) # 负对数边际似然
+            print('Iter %d/%d - Loss: %.3f' % (_, self.iterations, loss.item()))
             loss.backward()
             optimizer.step()
+
 
         # 5. 预测
         self.model.eval()

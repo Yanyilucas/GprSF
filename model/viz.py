@@ -47,6 +47,7 @@ class plotter:
         y_low, y_high = 0, 0
         for year in range(start_year, end_year + 1):
             y = self.prices_data[year]
+            #__import__('ipdb').set_trace()
             if y_low >= min(y):
                 y_low = min(y)
             if y_high <= max(y):
@@ -200,6 +201,7 @@ class plotter:
 
     def validate_dates(self, start_year: int, end_year: int):
         if start_year < self.years[0] or end_year > self.years[-1]:
+            
             raise ValueError('\n' +
                              'Input years out of available range! \n' +
                              'Max range available: {}-{}\n'.format(self.years[0], self.years[-1]) +

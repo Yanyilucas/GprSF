@@ -11,6 +11,7 @@ class csv_handler:
         self.csv_name = csv_name
         self.load_data(csv_name)
         self.df['Norm Adj Close'] = self.add_normalized_data(self.df)
+        #__import__('ipdb').set_trace()
         self.df['Quarter'] = self.add_quarters(self.df)
         self.max_days = 256
 
@@ -96,25 +97,23 @@ class csv_handler:
 
         # 6. 生成四个季度标签（Q1 ~ Q4），供后续逻辑使用
         self.quarters = ['Q' + str(i) for i in range(1, 5)]
-
-    def add_normalized_data(self, df):
-        normalized_list = []
-
-        self.years = list(df.Date)
-        self.years = list({year.year for year in self.years})
+        self.years = list(self.df.Date)
+        self.years=list({year.year for year in self.years})#年份升序排列
         self.years.sort()
-        for year in self.years:
-            prices = self.get_year_data(year=year, normalized=False)
-            mean = np.mean(prices)
-            std = np.std(prices)
-            prices = [(p - mean) / std for p in prices]
-            prices = [p - prices[0] for p in prices]
-            normalized_list.append(prices)
+    def add_normalized_data(self, df):
+        """
+        为每一年的'Adj Close'添加归一化后的数据，并将每年的第一个数据点平移到0。
+        """
+        # 按年份分组
+        grouped = df.groupby(df['Date'].dt.year)
+        # 归一化每组数据
+        df['Norm Adj Close'] = grouped['Adj Close'].transform(lambda x: (x - x.mean()) / x.std())
 
-        # 将所有价格列表转换为 DataFrame 并合并
-        normalized = pd.concat([pd.DataFrame(lst) for lst in normalized_list], ignore_index=True)
+        # 将每年的第一个数据点平移到0
+        df['Norm Adj Close'] = grouped['Norm Adj Close'].transform(lambda x: x - x.iloc[0])
 
-        return normalized
+        return df['Norm Adj Close']
+
     def add_quarters(self, df):
         quarters_list = []
 
