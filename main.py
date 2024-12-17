@@ -4,7 +4,7 @@ import os
 import sys
 from model import viz
 
-companies = []
+companies = ['COMP','NDX','OMHX25']
 plotters:  Dict[str, viz.plotter] = {}
 start_year = 2015
 
@@ -19,11 +19,14 @@ def make_summary(company_name):
     plotter = plotters[company_name]
 
     plotter.show_whole_time_series()
-    plotter.show_time_series(start_year=start_year, end_year=2016)
-    plotter.show_preprocessed_prices(start_year=start_year, end_year=2016)
-    plotter.show_gp_prediction(train_start=start_year, train_end=2016, pred_year=2017)
-    plotter.show_time_series(start_year=start_year, end_year=2018)
-    plotter.show_gp_prediction(train_start=start_year, train_end=2018, pred_year=2018, pred_quarters= [3, 4])
+    plotter.show_time_series(start_year=start_year, end_year=2024)
+    plotter.show_preprocessed_prices(start_year=start_year, end_year=2024)
+    plotter.show_gp_prediction(train_start=start_year, train_end=2023, pred_year=2024)
+    plotter.show_time_series(start_year=start_year, end_year=2024)
+    
+    #@ train_start and train_end are the years used for training the model
+    #@ 确保 pred_year 在 train_end 之后
+    #plotter.show_gp_prediction(train_start=start_year, train_end=2022, pred_year=2024, pred_quarters= [3, 4])
 
 
 def init_data():

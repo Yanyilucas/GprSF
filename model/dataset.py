@@ -98,8 +98,6 @@ class csv_handler:
         self.quarters = ['Q' + str(i) for i in range(1, 5)]
 
     def add_normalized_data(self, df):
-        # if self.csv_name == 'COMP':
-        #     __import__('ipdb').set_trace()
         normalized_list = []
 
         self.years = list(df.Date)

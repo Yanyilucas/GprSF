@@ -40,7 +40,7 @@ class GPR:
         self.kernels = []
 
         # 训练迭代次数，可以根据需求调整
-        self.iterations = 50
+        self.iterations = 80
 
     def get_eval_model(self, start_year: int, end_year: int, pred_year: int, pred_quarters: list = None):
         """
