@@ -117,7 +117,7 @@ class plotter:
         plt.plot(x_obs, prices, color='#006699', alpha=.95, label=u'Observations ' + str(pred_year), zorder=10)
         plt.plot(x_mesh, y_mean, color='#ff0066', linestyle='--', label=u'Prediction')
         plt.fill_between(x_mesh, y_lower, y_upper,
-                         alpha=.25, label='95% confidence', color='#ff0066')
+                         alpha=.25, label='[μ-σ, μ+σ]', color='#ff0066')
 
         handles, labels = plt.gca().get_legend_handles_labels()
         new_labels, new_handles = [], []
