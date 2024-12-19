@@ -101,7 +101,7 @@ class plotter:
                                                           pred_year=pred_year,
                                                           pred_quarters=pred_quarters)
         if self.isGpytorch:
-            #* 经验公式 [μ-σ, μ+σ] 为 95% 置信区间
+            #* [μ-σ, μ+σ] 
             #注意 y_cov的值是不一样的,但在数值上接近
             y_lower = y_mean - np.sqrt(y_cov)
             y_upper = y_mean + np.sqrt(y_cov)
@@ -153,8 +153,7 @@ class plotter:
 
     def show_time_series(self, start_year: int, end_year: int, intermediate: bool = True):
         self.validate_dates(start_year=start_year, end_year=end_year)
-        # if self.company_name == 'COMP':
-        #             __import__('ipdb').set_trace()
+
         prices_data = self.company_handler.get_whole_prices(start_year=start_year, end_year=end_year)
 
         fig = plt.figure(num=self.company_name + ' prices')

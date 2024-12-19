@@ -93,22 +93,19 @@ class csv_handler:
         grouped = df.groupby(df['Date'].dt.year)
         df['Norm Adj Close'] = grouped['Adj Close'].transform(lambda x: (x - x.mean()) / x.std())
 
-        df['Norm Adj Close'] = grouped['Norm Adj Close'].transform(lambda x: x - x.iloc[-1])        #__import__('ipdb').set_trace()
+        df['Norm Adj Close'] = grouped['Norm Adj Close'].transform(lambda x: x - x.iloc[-1])       
         return df['Norm Adj Close']
 
     def add_quarters(self, df):
         quarters_list = []
 
         for year in self.years:
-            # 筛选特定年份的数据
             dates = df.loc[df['Date'].dt.year == year, 'Date']
-            # 获取每个日期对应的季度
             quarters = [self.get_quarter(date.month) for date in dates]
-            # 将季度数据转换为 DataFrame 并添加到列表中
             quarters_df = pd.DataFrame(quarters)
             quarters_list.append(quarters_df)
 
-        # 一次性合并所有季度 DataFrame
+
         quarters = pd.concat(quarters_list, ignore_index=True)
 
         return quarters
@@ -117,7 +114,6 @@ class csv_handler:
         return self.quarters[(month - 1) // 3]
 
     def shift_first_year_prices(self):
-        #__import__('ipdb').set_trace()
         prices = pd.DataFrame(self.get_year_data(self.years[0])[::-1])
         df = pd.DataFrame([0 for _ in range(self.max_days - len(prices.index))])
         df = pd.concat([df, prices], ignore_index=True)
