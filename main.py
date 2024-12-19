@@ -6,7 +6,7 @@ from model import viz
 
 companies = ['NQUS500LC','COMP','OMHX25','NDX']
 plotters:  Dict[str, viz.plotter] = {}
-start_year = 2016 #事实证明,选取的年份数过多对于预测的准确性未必准确
+start_year = 2023 #事实证明,选取的年份数过多对于预测的准确性未必准确
 
 
 def main():
