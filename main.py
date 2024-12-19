@@ -4,9 +4,9 @@ import os
 import sys
 from model import viz
 
-companies = ['COMP','OMHX25','NDX']
+companies = ['NQUS500LC','COMP','OMHX25','NDX']
 plotters:  Dict[str, viz.plotter] = {}
-start_year = 2014
+start_year = 2016
 
 
 def main():

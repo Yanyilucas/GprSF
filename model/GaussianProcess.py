@@ -13,9 +13,27 @@ class ExactGPModel(gpytorch.models.ExactGP):
     def __init__(self, train_x, train_y, likelihood):
         super().__init__(train_x, train_y, likelihood)
         # 均值函数
+#         self.mean_module = gpytorch.means.ConstantMean()
+#         # 卷积核函数，ScaleKernel 包裹 RBFKernel
+#         # self.covar_module = gpytorch.kernels.ScaleKernel(gpytorch.kernels.RBFKernel())
+#         #尝试不同的卷积核心函数
+#         self.covar_module = gpytorch.kernels.ScaleKernel(
+#     gpytorch.kernels.MaternKernel(nu=2.5,lengthscale=0.001)
+# )
+# 使用线性均值函数，拟合数据中的趋势
+        # 均值函数：线性均值函数，用于捕捉股票的长期趋势
+        # __import__('ipdb').set_trace()
         self.mean_module = gpytorch.means.ConstantMean()
-        # 卷积核函数，ScaleKernel 包裹 RBFKernel
-        self.covar_module = gpytorch.kernels.ScaleKernel(gpytorch.kernels.RBFKernel())
+        
+        # 卷积核函数：复合核函数，结合了不同的核函数
+        self.covar_module = gpytorch.kernels.ScaleKernel(
+            # Matern 核，适用于波动性
+            gpytorch.kernels.MaternKernel(nu=2.5, lengthscale=0.05) 
+            + 
+            # RBF 核，适用于平滑的长期趋势
+            gpytorch.kernels.RBFKernel(lengthscale=0.1)
+        )
+
 
     def forward(self, x):
         mean_x = self.mean_module(x)
@@ -40,7 +58,7 @@ class GPR:
         self.kernels = []
 
         # 训练迭代次数，可以根据需求调整
-        self.iterations = 20
+        self.iterations = 80
 
     def get_eval_model(self, start_year: int, end_year: int, pred_year: int, pred_quarters: list = None):
         """
@@ -68,7 +86,7 @@ class GPR:
                 pd.Series([0.0], index=[first_year_prices.index[0] - 1]),
                 first_year_prices
             ])
-
+        # __import__('ipdb').set_trace()
         # 收集所有训练数据
         data_X = []
         data_Y = []
@@ -120,12 +138,14 @@ class GPR:
         self.model.train()
         self.likelihood.train()
 
+        # optimizer = torch.optim.Adam([
+        # {'params': self.model.mean_module.parameters(), 'lr': 0.08},  # 仅包含模型均值部分参数
+        # {'params': self.model.covar_module.parameters(), 'lr': 0.08}, # 仅包含模型协方差部分参数
+        # {'params': self.likelihood.parameters(), 'lr': 0.08},         # 仅包含似然部分参数
+        # ])
         optimizer = torch.optim.Adam([
-        {'params': self.model.mean_module.parameters(), 'lr': 0.1},  # 仅包含模型均值部分参数
-        {'params': self.model.covar_module.parameters(), 'lr': 0.1}, # 仅包含模型协方差部分参数
-        {'params': self.likelihood.parameters(), 'lr': 0.1},         # 仅包含似然部分参数
-        ])
-
+            {'params': self.model.parameters()},  # 模型参数
+        ], lr=0.1)
         mll = gpytorch.mlls.ExactMarginalLogLikelihood(self.likelihood, self.model)
 
         # 训练循环
@@ -148,9 +168,10 @@ class GPR:
             y_mean = observed_pred.mean.numpy()
             y_cov = observed_pred.variance.numpy()
 
+
         # 存储核函数以便查看
         self.kernels.append(self.model.covar_module)
-
+        #__import__('ipdb').set_trace()
         return x_mesh, y_mean, y_cov
 
     def get_kernels(self):

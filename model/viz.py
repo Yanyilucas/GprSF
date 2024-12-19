@@ -102,6 +102,7 @@ class plotter:
                                                           pred_quarters=pred_quarters)
         if self.isGpytorch:
             #* 经验公式 [μ-σ, μ+σ] 为 95% 置信区间
+            #注意 y_cov的值是不一样的,但在数值上接近
             y_lower = y_mean - np.sqrt(y_cov)
             y_upper = y_mean + np.sqrt(y_cov)
         else:    
