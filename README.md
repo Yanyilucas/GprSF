@@ -1,3 +1,56 @@
-# GPR-Stock-Forecast 📈 🔍
+# GprSF : A Gaussian Process Regression Model for Stock-Forecast 
 
-A Gaussian Process Regression Model for Predicting Stock Trends
+The repository is an implementation of the ***Stochastic Processes*** course project using [GPyTorch](https://github.com/cornellius-gp/gpytorch).
+
+## 🏗️ Installation
+
+```shell
+git clone https://github.com/Yanyilucas/GprSF.git
+cd GprSF
+```
+
+We recommend  using [Anaconda](https://www.anaconda.com) to set up the environment. 
+
+```shell
+conda env create -f env.yml
+conda activate gprsf
+```
+
+## 💻 Quick Start
+
+### ⏬ Data download
+
+You can download custom data from [Nasdaq](https://www.nasdaq.com).And place the csv file in the `data` directory.
+
+### Data processing 
+
+Assuming that $x$ is the observed value of the stock price on a particular day, $\mu$ is the mean of the stock price over all samples, and $\sigma$ is the standard deviation of the stock price over all samples, then $x^*$ is the standardized stock price on that day.
+$$
+x^*=\frac{x-\mu}{\sigma} \notag
+$$
+
+
+### 🔍 Training & Evaluation 
+
+Run the following command and check the output in the `pic` directory.
+
+```sh
+sh run.sh
+```
+
+![2016-2024-prices](/Users/lz/Desktop/Course/RP/GPR-Stock-Forecast/README.assets/2016-2024-prices.png)
+
+
+
+![image-20241219194839568](/Users/lz/Desktop/Course/RP/GPR-Stock-Forecast/README.assets/image-20241219194839568.png)
+
+
+
+![image-20241219193704168](/Users/lz/Desktop/Course/RP/GPR-Stock-Forecast/README.assets/image-20241219193704168.png)
+
+
+
+## Acknowledge
+
+Our code is based on the implementation of [GaussianProcesses](https://github.com/gdroguski/GaussianProcesses). Thanks for his excellent  work.
+

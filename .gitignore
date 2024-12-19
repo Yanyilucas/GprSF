@@ -1,3 +1,9 @@
 pic/*
 
 cache/*
+
+data/misc/*
+
+*.pyc
+
+__pycache__/*
