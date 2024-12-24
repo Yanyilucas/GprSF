@@ -12,7 +12,7 @@ cd GprSF
 We recommend using [Anaconda](https://www.anaconda.com) to set up the environment.
 
 ```shell
-conda env create -f env.yml
+conda env create -f env.yaml
 conda activate gprsf
 ```
 
