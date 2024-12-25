@@ -13,7 +13,7 @@ We recommend using [Anaconda](https://www.anaconda.com) to set up the environmen
 
 ```shell
 conda env create -f env.yaml
-conda activate ML
+conda activate gprsf
 ```
 
 ## 💻 Quick Start
