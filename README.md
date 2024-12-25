@@ -46,4 +46,4 @@ sh run.sh
 
 ## Acknowledge
 
-Our code is based on the implementation of [GaussianProcesses](https://github.com/gdroguski/GaussianProcesses). Thanks for his excellent work.
+Our code is based on the implementation of [GaussianProcesses](https://github.com/gdroguski/GaussianProcesses) and [Long-term Stock Market Forecasting using Gaussian Processes](https://www.cs.ubc.ca/~nando/540-2013/projects/p5.pdf). Thanks for their excellent work.
